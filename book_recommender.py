@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from collections import Counter
 from flask import Flask, request, jsonify
 app=Flask(__name__)   #using a single module
 
