@@ -76,11 +76,11 @@ def Book_recomendation(book_title, dataset_for_corr, ratings_data_raw):
 def GET_book_recomendation ():
     
     # load ratings
-    ratings = pd.read_csv('https://github.com/Katlii/heroku-book_recommendation/BX-Book-Ratings.csv', sep=';', encoding='cp1251', error_bad_lines=False)
+    ratings = pd.read_csv('https://github.com/Katlii/heroku-book_recommendation/blob/master/BX-Book-Ratings.csv', sep=';', encoding='cp1251', error_bad_lines=False)
     ratings = ratings[ratings['Book-Rating']!=0]
 
     # load books
-    books = pd.read_csv('https://github.com/Katlii/heroku-book_recommendation/BX-Books.csv',  encoding='cp1251', sep=';', error_bad_lines=False)  #Use on_bad_lines in the future.
+    books = pd.read_csv('https://github.com/Katlii/heroku-book_recommendation/blob/master/BX-Books.csv',  encoding='cp1251', sep=';', error_bad_lines=False)  #Use on_bad_lines in the future.
 
     ratings=ratings.rename(columns={'User-ID':'user_id', 'Book-Rating': 'ratings'})
     books= books.rename(columns={'Book-Title':'title', 'Book-Author': 'author', 'Year-Of-Publication': 'year', 'Publisher':'publisher'})
