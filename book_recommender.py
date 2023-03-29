@@ -72,7 +72,7 @@ def Book_recomendation(book_title, dataset_for_corr, ratings_data_raw):
     #print(f"Best 10 correlated books for {LoR_list[i]}:\n{result_dict[LoR_list[i]]}")
     #print(f"Worst 10 correlated books for {LoR_list[i]}:\n{worst_dict[LoR_list[i]]}")
 
-@app.route('/recommendation', methods=['POST'])
+@app.route('/recommendation', methods=['GET'])
 def GET_book_recomendation ():
     
     # load ratings
