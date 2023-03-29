@@ -86,7 +86,6 @@ def GET_book_recomendation ():
     books= books.rename(columns={'Book-Title':'title', 'Book-Author': 'author', 'Year-Of-Publication': 'year', 'Publisher':'publisher'})
     # Get book title from request data
     #book_title = request.form['title']
-    book_title='1984'
     dataset_for_corr, ratings_data_raw = Correlation(ratings, books, book_title)
     result_dict = {}
     worst_dict = {}
