@@ -53,13 +53,6 @@ class functions:
         return result, worst
 
 
-ratings = pd.read_csv('BX-Book-Ratings.csv', sep=';', encoding='cp1251', error_bad_lines=False)
-ratings = ratings[ratings['Book-Rating']!=0]
-
-# load books
-books = pd.read_csv('BX-Books.csv',  encoding='cp1251', sep
-
-
 @app.route('/recommendations', methods=['POST'])
 def get_recommendations():
     data = request.get_json()
