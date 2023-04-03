@@ -81,11 +81,12 @@ def get_recommendations():
     dataset_for_corr, ratings_data_raw = functions().Correlation(ratings, books, book_title)
     result, worst = functions().Book_recomendation(book_title, dataset_for_corr, ratings_data_raw)
 
-    recommendations = {}
-    recommendations['top_10'] = result.to_dict('records')
-    recommendations['bottom_10'] = worst.to_dict('records')
+    #recommendations = {}
+    #recommendations['top_10'] = result.to_dict('records')
+    #recommendations['bottom_10'] = worst.to_dict('records')
 
-    return jsonify(recommendations)
+    #return jsonify(recommendations)
+    return result
 
 if __name__ == '__main__':
     app.run()
