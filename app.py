@@ -30,7 +30,7 @@ class functions:
         return result, worst
 
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET"])
 def recommend_books():
     data = request.get_json()
     book_title = data.get('book_title')
