@@ -42,3 +42,6 @@ def recommend_books():
     result, worst = functions().Book_recomendation(book_title, dataset_for_corr, ratings_data_raw)
     response = {'top_recommendations': result.to_dict(), 'worst_recommendations': worst.to_dict()}
     return jsonify(response)
+
+if __name__ == '__main__':
+    app.run(debug=True)
