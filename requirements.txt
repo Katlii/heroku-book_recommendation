@@ -5,5 +5,4 @@ numpy
 streamlit
 requests
 boto3
-csv
 io
