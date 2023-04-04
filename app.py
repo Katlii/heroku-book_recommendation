@@ -1,6 +1,9 @@
 import pandas as pd
 import numpy as np
 from flask import Flask, request, jsonify
+import boto3
+import csv
+from io import StringIO
 
 app = Flask(__name__)
 
@@ -30,33 +33,43 @@ class functions:
         return result, worst
 
 
-@app.route("/", methods=["GET"])
-def recommend_books():
-    data = request.get_json()
-    book_title = data.get('book_title')
-    ratings = pd.read_csv('BX-Book-Ratings.csv', sep=';', encoding='cp1251', error_bad_lines=False)
-    ratings = ratings[ratings['Book-Rating']!=0]
+@app.route('/get_recommendations', methods=['POST'])
+def get_recommendations():
+    s3 = boto3.client('s3', aws_access_key_id='AKIA2DEBGAQE3HVC2WML', aws_secret_access_key='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')
+    responseBook = s3.get_object(Bucket='bookrecommender', Key='BX-Books.csv')
+    responseRatings = s3.get_object(Bucket='ratingsofbooks', Key='BX-Book-Ratings.csv')
 
-    # load books
-    books = pd.read_csv('BX-Books.csv',  encoding='cp1251', sep=';', error_bad_lines=False)  #Use on_bad_lines in the future.
+    csv_data1 = responseBook['Body'].read().decode('cp1251')
+    csv_data2 = responseRatings['Body'].read().decode('cp1251')
 
-    ratings=ratings.rename(columns={'User-ID':'user_id', 'Book-Rating': 'ratings'})
-    books= books.rename(columns={'Book-Title':'title', 'Book-Author': 'author', 'Year-Of-Publication': 'year', 'Publisher':'publisher'})
+    book_title = request.json['book_title']
+    data1 = StringIO(csv_data1)
+    data2 = StringIO(csv_data2)
 
-    isbnForUser=ratings.groupby('user_id').ISBN.nunique()
-    average=sum(isbnForUser.to_dict().values())/len(isbnForUser)
-    x=isbnForUser >5
-    x=x[x].index.tolist()
-    ratings=ratings[ratings['user_id'].isin(x)]
+    ratings = pd.read_csv(data2, delimiter=';', error_bad_lines=False)
+    books = pd.read_csv(data1, delimiter=';', error_bad_lines=False)
+
+    ratings = ratings.rename(columns={'User-ID':'user_id', 'Book-Rating': 'ratings'})
+    books = books.rename(columns={'Book-Title':'title', 'Book-Author': 'author', 'Year-Of-Publication': 'year', 'Publisher':'publisher'})
+
+    isbnForUser = ratings.groupby('user_id').ISBN.nunique()
+    average = sum(isbnForUser.to_dict().values())/len(isbnForUser)
+    x = isbnForUser > int(average)
+    x = x[x].index.tolist()
+    ratings = ratings[ratings['user_id'].isin(x)]
 
     dataset = pd.merge(ratings, books, on=['ISBN'])
-    dataset_lowercase=dataset.apply(lambda x: x.str.lower() if(x.dtype == 'object') else x)
-    dataset_lowercase= dataset_lowercase.drop_duplicates(['user_id', 'title'])
-    dataset_lowercase=dataset_lowercase.drop(['Image-URL-S', 'Image-URL-M', 'Image-URL-L'], axis=1)
+    dataset_lowercase = dataset.apply(lambda x: x.str.lower() if (x.dtype == 'object') else x)
+    dataset_lowercase = dataset_lowercase.drop_duplicates(['user_id', 'title'])
+    dataset_lowercase = dataset_lowercase.drop(['Image-URL-S', 'Image-URL-M', 'Image-URL-L'], axis=1)
+
     dataset_for_corr, ratings_data_raw = functions().Correlation(ratings, books, book_title, dataset_lowercase)
     result, worst = functions().Book_recomendation(book_title, dataset_for_corr, ratings_data_raw)
-    response = {'top_recommendations': result.to_dict(), 'worst_recommendations': worst.to_dict()}
-    return jsonify(response)
+
+    result_dict = result.to_dict()
+    worst_dict = worst.to_dict()
+
+    return jsonify({'result': result_dict, 'worst': worst_dict})
 
 if __name__ == '__main__':
     app.run(debug=True)
