@@ -1,7 +1,4 @@
-flask
-pandas
+aiogram
 gunicorn
-numpy
-streamlit
 requests
-boto3
+
